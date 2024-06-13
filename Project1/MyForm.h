@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <random>
 
-#define N 500 // Длительность входной реализации смеси сигнала с шумом в шагах дискретизации
+#define N 5 // Длительность входной реализации смеси сигнала с шумом в шагах дискретизации
 
 
 namespace Project1 {
@@ -95,6 +95,8 @@ namespace Project1 {
 			this->chart1->TabIndex = 0;
 			this->chart1->Text = L"chart1";
 			this->chart1->Click += gcnew System::EventHandler(this, &MyForm::chart1_Click);
+			//chart1->Series[0]->Name = "m_rek";
+			//chart1->Series[1]->Name = "m_ist";
 			// 
 			// button1
 			// 
@@ -123,48 +125,41 @@ namespace Project1 {
 	private: System::Void chart1_Click(System::Object^ sender, System::EventArgs^ e) {
 	}
 	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
-		//help
+		//1.	В результате эксперимента получена следующая реализация: 5, 7, 2, -2, 7. Построить рекуррентную оценку математического ожидания
 
 
-		array<double>^ ee = gcnew array<double>(500);
-		array<double>^ d_rek = gcnew array<double>(500);
-		array<double>^ d_ist = gcnew array<double>(500);
-		array<double>^ m_rek = gcnew array<double>(500);
+		array<double>^ ee = gcnew array<double>(5);
+		array<double>^ m_rek = gcnew array<double>(5);
+		array<double>^ m_ist = gcnew array<double>(5);
 
+
+		int a0;
 		int i;
 
 
 
-		for (i = 0; i < N; i++)
-			d_ist[i] = (M_PI - 2.0) / M_PI;
 
-		for (i = 0; i < N; i++)
-		{
-			ee[i] = gauss(0, 1);
-			if (ee[i] < 0)
-				ee[i] = -ee[i];
-		}
 
-		d_rek[1] = 0;
-		m_rek[1] = ee[0];
+		ee[0] = 5;
+		ee[1] = 7;
+		ee[2] = 2;
+		ee[3] = -2;
+		ee[4] = 7;
+
+		m_rek[1] = ee[1];
 
 		for (i = 2; i < N; i++)
 		{
 			m_rek[i] = (i - 1.0) / i * m_rek[i - 1] + 1.0 / i * ee[i];
 		}
 
-		for (i = 2; i < N; i++)
-		{
-			d_rek[i] = (i - 1.) / i * d_rek[i - 1] + 1. / i * (ee[i] - m_rek[i]) * (ee[i] - m_rek[i]);
-		}
-
 		for (int n = 0; n < N; n++) {
-			chart1->Series[0]->Points->AddXY(n, d_rek[n]);
-			chart1->Series[1]->Points->AddXY(n, d_ist[n]);
+			
+			chart1->Series[0]->Points->AddXY(n, m_rek[n]);
+			chart1->Series[1]->Points->AddXY(n, m_ist[n]);
 
 
 		}
-
 	}
 		   double gauss(double mean, double stddev)
 		   {//Box muller method
