@@ -4,9 +4,7 @@
 #include <stdlib.h>
 #include <random>
 
-#define N 1000 // Длительность входной реализации смеси сигнала с шумом в шагах дискретизации
-#define L1 500 // Длительность сигнала и импульсной характеристики согласованного фильтра в шагах дискретизации
-#define L2 700 
+#define N 500 // Длительность входной реализации смеси сигнала с шумом в шагах дискретизации
 
 
 namespace Project1 {
@@ -69,6 +67,7 @@ namespace Project1 {
 			System::Windows::Forms::DataVisualization::Charting::ChartArea^ chartArea1 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
 			System::Windows::Forms::DataVisualization::Charting::Legend^ legend1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Legend());
 			System::Windows::Forms::DataVisualization::Charting::Series^ series1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^ series2 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
 			this->chart1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Chart());
 			this->button1 = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart1))->BeginInit();
@@ -86,7 +85,12 @@ namespace Project1 {
 			series1->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Line;
 			series1->Legend = L"Legend1";
 			series1->Name = L"Series1";
+			series2->ChartArea = L"ChartArea1";
+			series2->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Line;
+			series2->Legend = L"Legend1";
+			series2->Name = L"Series2";
 			this->chart1->Series->Add(series1);
+			this->chart1->Series->Add(series2);
 			this->chart1->Size = System::Drawing::Size(575, 287);
 			this->chart1->TabIndex = 0;
 			this->chart1->Text = L"chart1";
@@ -121,42 +125,39 @@ namespace Project1 {
 	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
 		//help
 
-		// Полезный сигнал, импульсная характеристика, входная реализация, выходная реализация
-		array<double>^ x = gcnew array<double>(N);
-		array<double>^ y = gcnew array<double>(N);
-		array<double>^ k = gcnew array<double>(N);
-		array<double>^ s = gcnew array<double>(N);
-		int i, p, n;
 
-		// Формирование входного сигнала
-		for (i = 0; i < N; i++) {
-			s[i] = exp(-3 * i);
-			x[i] = s[i];
-		}
-		float delta1,delta2;
-		//  Формирование импульсной характеристики
-		for (i = 0; i < N; i++) {
-			k[i] = ((i == L2) ? 1 : 0) + ((i == L1) ? 1 : 0);
-		}
+		array<double>^ ee = gcnew array<double>(500);
+		array<double>^ m_rek = gcnew array<double>(500);
+		array<double>^ m_ist = gcnew array<double>(500);
 
-		// Добавление шума ко входной реализации
-		for (i = 0; i < N; i++) {
-			x[i] = x[i] + gauss(0, 0.5);
-		}
 
-		// Согласованная фильтрация
-		for (i = 0; i < N; i++) {
-			y[i] = 0.0;
-			for (p = 0; p < N; p++) { //я изменил p > L тк не выполняется
-				if ((i - p) >= 0) {
-					y[i] = y[i] + x[i - p] * k[p];
-				}
+		int a0;
+		int i;
+
+
+
+			for (i = 1; i < N; i++)
+			{
+				m_ist[i] = exp(-0.5 * 0.5 / 2.0) / sqrt(2 * M_PI);
 			}
-		}
 
-		for (int n = 0; n < N; n++) {
-			chart1->Series[0]->Points->AddXY(n, y[n]);
+			for (i = 1; i < N; i++)
+			{
+				ee[i] = gauss(0, 1);
+				if (ee[i] <= 0.5)
+					ee[i] = 0;
+			}
 
+			m_rek[1] = ee[1];
+
+			for (i = 2; i < N; i++)
+				m_rek[i] = (i - 1.0) / i * m_rek[i - 1] + 1.0 / i * ee[i];
+
+			for (int n = 0; n < N; n++) {
+				chart1->Series[0]->Points->AddXY(n, m_rek[n]);
+				chart1->Series[1]->Points->AddXY(n, m_ist[n]);
+
+			
 		}
 	}
 		   double gauss(double mean, double stddev)
