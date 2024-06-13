@@ -125,7 +125,7 @@ namespace Project1 {
 	private: System::Void chart1_Click(System::Object^ sender, System::EventArgs^ e) {
 	}
 	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
-		//1.	В результате эксперимента получена следующая реализация: 5, 7, 2, -2, 7. Построить рекуррентную оценку математического ожидания
+		//2.	В результате эксперимента получена следующая реализация: 2, 1, 0, -2, 5. Построить рекуррентную оценку дисперсии.
 
 
 		array<double>^ ee = gcnew array<double>(5);
@@ -140,11 +140,11 @@ namespace Project1 {
 
 
 
-		ee[0] = 5;
-		ee[1] = 7;
-		ee[2] = 2;
+		ee[0] = 2;
+		ee[1] = 1;
+		ee[2] = 0;
 		ee[3] = -2;
-		ee[4] = 7;
+		ee[4] = 5;
 
 		m_rek[1] = ee[1];
 
